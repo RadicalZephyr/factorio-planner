@@ -1,6 +1,8 @@
 import Browser
+import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Events exposing (..)
+import Http
 import Json.Decode exposing (Decoder, field, int, list, map2, map4, string)
 
 
@@ -19,14 +21,14 @@ main =
 
 
 type alias Model =
-  {
+  { cookbook : Maybe (Dict String Recipe)
   }
 
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( Model
-  , Cmd.none
+  ( Model Nothing
+  , getRecipeData ()
   )
 
 
@@ -34,16 +36,22 @@ init _ =
 
 
 type Msg
-  = Dummy
+  = RecipeData (Result Http.Error (List Recipe))
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
-      Dummy ->
-        ( model
-        , Cmd.none
-        )
+      RecipeData result ->
+        case result of
+            Ok recipes ->
+              ( Model (Just (createCookbook recipes))
+              , Cmd.none
+              )
+            Err _ ->
+              ( model
+              , Cmd.none
+              )
 
 
 -- SUBSCRIPTIONS
@@ -89,3 +97,16 @@ recipeDecoder =
     (field "energy" int)
     (field "products" (list ingredientDecoder))
     (field "ingredients" (list ingredientDecoder))
+
+allRecipesDecoder : Decoder (List Recipe)
+allRecipesDecoder =
+  list recipeDecoder
+
+getRecipeData : () -> Cmd Msg
+getRecipeData () =
+  Http.send RecipeData (Http.get "/src/recipes.json" allRecipesDecoder)
+
+createCookbook : List Recipe -> Dict String Recipe
+createCookbook recipes =
+  Dict.fromList
+    (List.map (\x -> (x.name, x)) recipes)
