@@ -1,7 +1,11 @@
-module Main exposing (..)
+type alias Ingredient =
+    { name: String
+    , amount: Int
+    }
 
-type alias Item =
+type alias Recipe =
     { name : String
-    , outputScale : Int
-    , ingredients : List (Int, String)
+    , energy: Int
+    , products: List Ingredient
+    , ingredients : List Ingredient
     }
