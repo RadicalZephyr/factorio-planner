@@ -3,7 +3,7 @@ import Dict exposing (Dict)
 import Html exposing (..)
 import Html.Events exposing (..)
 import Http
-import Json.Decode exposing (Decoder, field, int, list, map2, map4, string)
+import Json.Decode exposing (Decoder, field, float, int, list, map2, map4, string)
 
 
 -- MAIN
@@ -45,7 +45,7 @@ update msg model =
       RecipeData result ->
         case result of
             Ok recipes ->
-              ( Model (createCookbook (Debug.log "recipes" recipes))
+              ( Model (createCookbook recipes)
               , Cmd.none
               )
             Err e ->
@@ -63,7 +63,6 @@ update msg model =
 subscriptions : Model -> Sub Msg
 subscriptions model =
   Sub.none
-
 
 
 -- VIEW
@@ -84,7 +83,7 @@ type alias Ingredient =
 
 type alias Recipe =
   { name : String
-  , energy: Int
+  , energy: Float
   , products: List Ingredient
   , ingredients : List Ingredient
   }
@@ -99,7 +98,7 @@ recipeDecoder : Decoder Recipe
 recipeDecoder =
   map4 Recipe
     (field "name" string)
-    (field "energy" int)
+    (field "energy" float)
     (field "products" (list ingredientDecoder))
     (field "ingredients" (list ingredientDecoder))
 
