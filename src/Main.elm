@@ -32,6 +32,11 @@ init _ =
   , getRecipeData ()
   )
 
+getRecipeData : () -> Cmd Msg
+getRecipeData () =
+  Http.send RecipeData <|
+    Http.get "/src/recipes.json" allRecipesDecoder
+
 
 -- UPDATE
 
@@ -62,6 +67,12 @@ update msg model =
         ( { model | name = Just name }
         , Cmd.none
         )
+
+createCookbook : List Recipe -> Dict String Recipe
+createCookbook recipes =
+  Dict.fromList
+    (List.map (\x -> (x.name, x)) recipes)
+
 
 -- SUBSCRIPTIONS
 
@@ -117,13 +128,3 @@ recipeDecoder =
 allRecipesDecoder : Decoder (List Recipe)
 allRecipesDecoder =
   list recipeDecoder
-
-getRecipeData : () -> Cmd Msg
-getRecipeData () =
-  Http.send RecipeData <|
-    Http.get "/src/recipes.json" allRecipesDecoder
-
-createCookbook : List Recipe -> Dict String Recipe
-createCookbook recipes =
-  Dict.fromList
-    (List.map (\x -> (x.name, x)) recipes)
