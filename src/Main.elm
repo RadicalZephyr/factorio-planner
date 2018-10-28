@@ -109,7 +109,8 @@ allRecipesDecoder =
 
 getRecipeData : () -> Cmd Msg
 getRecipeData () =
-  Http.send RecipeData (Http.get "/src/recipes.json" allRecipesDecoder)
+  Http.send RecipeData <|
+    Http.get "/src/recipes.json" allRecipesDecoder
 
 createCookbook : List Recipe -> Dict String Recipe
 createCookbook recipes =
