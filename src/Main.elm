@@ -21,13 +21,13 @@ main =
 
 
 type alias Model =
-  { cookbook : Maybe (Dict String Recipe)
+  { cookbook : Dict String Recipe
   }
 
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( Model Nothing
+  ( Model Dict.empty
   , getRecipeData ()
   )
 
@@ -45,10 +45,13 @@ update msg model =
       RecipeData result ->
         case result of
             Ok recipes ->
-              ( Model (Just (createCookbook recipes))
+              ( Model (createCookbook (Debug.log "recipes" recipes))
               , Cmd.none
               )
-            Err _ ->
+            Err e ->
+              let
+                thing = Debug.log "error" e
+              in
               ( model
               , Cmd.none
               )
@@ -70,6 +73,8 @@ view : Model -> Html Msg
 view model =
   div []
     [ h1 [] [ text "Hello World" ]
+    , ul []
+      (List.map (\x -> li [] [ text x ]) (Dict.keys model.cookbook))
     ]
 
 type alias Ingredient =
