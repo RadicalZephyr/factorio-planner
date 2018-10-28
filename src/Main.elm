@@ -1,6 +1,8 @@
 import Browser
 import Html exposing (..)
 import Html.Events exposing (..)
+import Json.Decode exposing (Decoder, field, int, list, map2, map4, string)
+
 
 -- MAIN
 
@@ -73,3 +75,17 @@ type alias Recipe =
   , products: List Ingredient
   , ingredients : List Ingredient
   }
+
+ingredientDecoder : Decoder Ingredient
+ingredientDecoder =
+  map2 Ingredient
+    (field "name" string)
+    (field "amount" int)
+
+recipeDecoder : Decoder Recipe
+recipeDecoder =
+  map4 Recipe
+    (field "name" string)
+    (field "energy" int)
+    (field "products" (list ingredientDecoder))
+    (field "ingredients" (list ingredientDecoder))
