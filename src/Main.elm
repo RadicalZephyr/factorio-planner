@@ -71,7 +71,7 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
   div []
-    [ h1 [] [ text "Hello World" ]
+    [ h1 [] [ text "Recipes" ]
     , ul []
       (List.map (\x -> li [] [ text x ]) (Dict.keys model.cookbook))
     ]
