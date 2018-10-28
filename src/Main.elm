@@ -22,12 +22,13 @@ main =
 
 type alias Model =
   { cookbook : Dict String Recipe
+  , name : Maybe String
   }
 
 
 init : () -> (Model, Cmd Msg)
 init _ =
-  ( Model Dict.empty
+  ( Model Dict.empty Nothing
   , getRecipeData ()
   )
 
@@ -37,6 +38,7 @@ init _ =
 
 type Msg
   = RecipeData (Result Http.Error (List Recipe))
+  | SelectRecipe String
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -45,7 +47,7 @@ update msg model =
       RecipeData result ->
         case result of
             Ok recipes ->
-              ( Model (createCookbook recipes)
+              ( { model | cookbook = (createCookbook recipes) }
               , Cmd.none
               )
             Err e ->
@@ -56,6 +58,10 @@ update msg model =
               , Cmd.none
               )
 
+      SelectRecipe name ->
+        ( { model | name = Just name }
+        , Cmd.none
+        )
 
 -- SUBSCRIPTIONS
 
@@ -67,13 +73,19 @@ subscriptions model =
 
 -- VIEW
 
+makeRecipeButton : String -> Html Msg
+makeRecipeButton name =
+  li [] [
+     button [ onClick (SelectRecipe name) ] [ text name ]
+    ]
 
 view : Model -> Html Msg
 view model =
   div []
     [ h1 [] [ text "Recipes" ]
+    , div [] [ text (Maybe.withDefault "" model.name) ]
     , ul []
-      (List.map (\x -> li [] [ text x ]) (Dict.keys model.cookbook))
+      (List.map makeRecipeButton (Dict.keys model.cookbook))
     ]
 
 type alias Ingredient =
